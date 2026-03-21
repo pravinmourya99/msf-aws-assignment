@@ -1,7 +1,12 @@
 locals {
   compartment_prefix = "${var.name_prefix}-${var.compartment_name}"
   public_subnets = [for s in var.subnets : s if s == "public"]
+  private_subnets = [for s in var.subnets : s if s != "public"]
   has_public_subnets = length(local.public_subnets) > 0
+  # NAT + EIP: one per "instance" (single key "single" or one per public subnet)
+  nat_for_each = var.enable_nat_gateway && local.has_public_subnets ? (
+    var.single_nat_gateway ? { "single" = local.public_subnets[0] } : { for s in local.public_subnets : s.name => s }
+  ) : {}
 }
 # -----------------------------------------------------------------------------
 # VPC
@@ -71,4 +76,66 @@ resource "aws_route_table_association" "public" {
 
   route_table_id = aws_route_table.public[0].id
   subnet_id = aws_subnet.this[each.value.name].id
+}
+
+# -----------------------------------------------------------------------------
+# Elastic IP
+# -----------------------------------------------------------------------------
+resource "aws_eip" "nat" {
+  for_each = local.nat_for_each
+
+  domain = "vpc"
+
+  tags = merge(var.tags, {
+    Name = "${local.compartment_prefix}-nat-eip-${each.key}"
+  })
+
+  depends_on = [aws_internet_gateway.this]
+}
+
+# -----------------------------------------------------------------------------
+# NAT Gateway (optional) - in first public subnet or one per AZ
+# -----------------------------------------------------------------------------
+
+resource "aws_nat_gateway" "this" {
+  for_each = local.nat_for_each
+
+  allocation_id = aws_eip.nat[each.key].id
+  subnet_id     = aws_subnet.this[each.value.name].id
+
+  tags = merge(var.tags, {
+    Name = "${local.compartment_prefix}-nat-${each.key}"
+  })
+
+  depends_on = [aws_internet_gateway.this]
+}
+
+# -----------------------------------------------------------------------------
+# Private route table(s): one per private subnet (or shared)
+# -----------------------------------------------------------------------------
+resource "aws_route_table" "private" {
+  for_each = { for s in local.private_subnets : s.name => s }
+
+  vpc_id = aws_vpc.this.id
+
+  dynamic "route" {
+    for_each = var.enable_nat_gateway && local.has_public_subnets ? [1] : []
+    content {
+      cidr_block     = "0.0.0.0/0"
+      nat_gateway_id = aws_nat_gateway.this[var.single_nat_gateway ? "single" : local.public_subnets[0].name].id
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name        = "${local.compartment_prefix}-rt-${each.value.type}"
+    Type        = each.value.type
+    Compartment = var.compartment_name
+  })
+}
+
+resource "aws_route_table_association" "private" {
+  for_each = { for s in local.private_subnets : s.name => s }
+
+  subnet_id      = aws_subnet.this[each.value.name].id
+  route_table_id = aws_route_table.private[each.value.name].id
 }

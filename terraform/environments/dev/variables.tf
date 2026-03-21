@@ -39,6 +39,8 @@ variable "compartments" {
   type = map(object({
     vpc_cidr                 = string
     enable_internet_gateway  = optional(bool, false)
+    enable_nat_gateway       = optional(bool, false)
+    single_nat_gateway       = optional(bool, false)
     subnets                  = list(object({
       name              = string
       cidr              = string

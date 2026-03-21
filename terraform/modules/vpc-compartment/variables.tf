@@ -29,6 +29,18 @@ variable "subnets" {
   }))
 }
 
+variable "enable_nat_gateway" {
+  description = "Whether to create NAT Gateway(s) in public subnet(s)"
+  type        = bool
+  default     = false
+}
+
+variable "single_nat_gateway" {
+  description = "Use a single NAT Gateway for all AZs (cost-saving for dev)"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)
