@@ -19,7 +19,7 @@ variable "project" {
 #----------------------------------------------------------------------
 variable "environment" {
   description = "Defines the environment e.g dev, uat, prod"
-  type = string
+  type        = string
 }
 
 # -----------------------------------------------------------------------------
@@ -39,5 +39,11 @@ variable "compartments" {
   type = map(object({
     vpc_cidr                 = string
     enable_internet_gateway  = optional(bool, false)
+    subnets                  = list(object({
+      name              = string
+      cidr              = string
+      availability_zone = string
+      type              = string
+    }))
   }))
 }

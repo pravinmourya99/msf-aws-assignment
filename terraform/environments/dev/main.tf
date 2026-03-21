@@ -11,6 +11,7 @@ module "vpc-compartment" {
   name_prefix             = local.name_prefix
   compartment_name        = each.key
   vpc_cidr                = each.value.vpc_cidr
+  subnets                 = each.value.subnets
   enable_internet_gateway = each.value.enable_internet_gateway
   tags                    = {}
 

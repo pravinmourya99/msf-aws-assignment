@@ -19,6 +19,16 @@ variable "enable_internet_gateway" {
   default     = false
 }
 
+variable "subnets" {
+  description = "List of subnets to be created, type represents if the subnet is private , public or interfacing etc"
+  type = list(object({
+    name = string
+    cidr = string
+    availability_zone = string
+    type = string
+  }))
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)
