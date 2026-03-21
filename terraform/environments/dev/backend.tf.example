@@ -1,0 +1,10 @@
+# File to copy as backend.tf and fill in bucket and key.
+# Then run: terraform init -reconfigure
+#
+# backend "s3" {
+#   bucket         = "bucket-placeholder"
+#   key            = "msf-assignment/dev/terraform.tfstate"
+#   region         = "ap-south-1"
+#   dynamodb_table = "terraform-state-lock"
+#   encrypt        = true
+# }
