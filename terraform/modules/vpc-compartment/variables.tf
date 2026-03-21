@@ -41,6 +41,12 @@ variable "single_nat_gateway" {
   default     = false
 }
 
+variable "enable_security_groups" {
+  description = "Whether to create security groups per subnet role"
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

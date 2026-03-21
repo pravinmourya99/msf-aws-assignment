@@ -41,6 +41,7 @@ variable "compartments" {
     enable_internet_gateway  = optional(bool, false)
     enable_nat_gateway       = optional(bool, false)
     single_nat_gateway       = optional(bool, false)
+    enable_security_groups   = optional(bool, true)
     subnets                  = list(object({
       name              = string
       cidr              = string

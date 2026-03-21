@@ -68,10 +68,9 @@ resource "aws_route_table" "public" {
 }
 
 # -----------------------------------------------------------------------------
-# Route table association
+# Public Route table association
 # -----------------------------------------------------------------------------
 resource "aws_route_table_association" "public" {
-
   for_each = {for s in local.public_subnets : s.name => s}
 
   route_table_id = aws_route_table.public[0].id
@@ -79,7 +78,7 @@ resource "aws_route_table_association" "public" {
 }
 
 # -----------------------------------------------------------------------------
-# Elastic IP
+# Elastic IP for NAT gateway
 # -----------------------------------------------------------------------------
 resource "aws_eip" "nat" {
   for_each = local.nat_for_each
@@ -133,9 +132,61 @@ resource "aws_route_table" "private" {
   })
 }
 
+# -----------------------------------------------------------------------------
+# Private Route table association
+# -----------------------------------------------------------------------------
 resource "aws_route_table_association" "private" {
   for_each = { for s in local.private_subnets : s.name => s }
 
   subnet_id      = aws_subnet.this[each.value.name].id
   route_table_id = aws_route_table.private[each.value.name].id
+}
+
+# -----------------------------------------------------------------------------
+# Security groups for non public subnets
+# -----------------------------------------------------------------------------
+resource "aws_security_group" "by_type" {
+  for_each = var.enable_security_groups ? { for t in toset([for s in var.subnets : s.type if s.type != "public"]) : t => t } : {}
+
+  name        = "${local.compartment_prefix}-sg-${each.key}"
+  description = "Security group for ${each.key} subnet in ${var.compartment_name}"
+  vpc_id      = aws_vpc.this.id
+
+  # Allow all outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, {
+    Name        = "${local.compartment_prefix}-sg-${each.key}"
+    Type        = each.key
+    Compartment = var.compartment_name
+  })
+}
+
+# -----------------------------------------------------------------------------
+# Security groups for public subnets
+# -----------------------------------------------------------------------------
+resource "aws_security_group" "public" {
+  count = var.enable_security_groups && local.has_public_subnets ? 1 : 0
+
+  name        = "${local.compartment_prefix}-sg-public"
+  description = "Security group for public subnet in ${var.compartment_name}"
+  vpc_id      = aws_vpc.this.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, {
+    Name        = "${local.compartment_prefix}-sg-public"
+    Type        = "public"
+    Compartment = var.compartment_name
+  })
 }
