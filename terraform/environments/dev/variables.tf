@@ -30,3 +30,14 @@ variable "extra_tags" {
   type        = map(string)
   default     = {}
 }
+
+# -----------------------------------------------------------------------------
+# Compartments
+# -----------------------------------------------------------------------------
+variable "compartments" {
+  description = "Map of compartment name to VPC configuration"
+  type = map(object({
+    vpc_cidr                 = string
+    enable_internet_gateway  = optional(bool, false)
+  }))
+}
