@@ -41,4 +41,23 @@ compartments = {
     ]
   }
 
+  # Workload Compartment Module X: web, compute, data, interfacing
+  workload-x = {
+    vpc_cidr                = "10.2.0.0/16"
+    enable_internet_gateway = false
+    enable_nat_gateway      = false
+    single_nat_gateway      = true
+    enable_security_groups  = true
+    subnets = [
+      { name = "web-1", cidr = "10.2.1.0/24", availability_zone = "ap-southeast-1a", type = "web" },
+      { name = "web-2", cidr = "10.2.2.0/24", availability_zone = "ap-southeast-1b", type = "web" },
+      { name = "compute-1", cidr = "10.2.10.0/24", availability_zone = "ap-southeast-1a", type = "compute" },
+      { name = "compute-2", cidr = "10.2.11.0/24", availability_zone = "ap-southeast-1b", type = "compute" },
+      { name = "data-1", cidr = "10.2.20.0/24", availability_zone = "ap-southeast-1a", type = "data" },
+      { name = "data-2", cidr = "10.2.21.0/24", availability_zone = "ap-southeast-1b", type = "data" },
+      { name = "interfacing-1", cidr = "10.2.30.0/24", availability_zone = "ap-southeast-1a", type = "interfacing" },
+      { name = "interfacing-2", cidr = "10.2.31.0/24", availability_zone = "ap-southeast-1b", type = "interfacing" },
+    ]
+  }
+
 }
