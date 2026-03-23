@@ -25,4 +25,20 @@ compartments = {
       { name = "interfacing-2", cidr = "10.0.21.0/24", availability_zone = "ap-southeast-1b", type = "interfacing" },
     ]
   }
+
+  # GEN Compartment: government access - public, interfacing
+  gen = {
+    vpc_cidr                = "10.1.0.0/16"
+    enable_internet_gateway = true
+    enable_nat_gateway      = true
+    single_nat_gateway      = true
+    enable_security_groups  = true
+    subnets = [
+      { name = "public-1", cidr = "10.1.1.0/24", availability_zone = "ap-southeast-1a", type = "public" },
+      { name = "public-2", cidr = "10.1.2.0/24", availability_zone = "ap-southeast-1b", type = "public" },
+      { name = "interfacing-1", cidr = "10.1.20.0/24", availability_zone = "ap-southeast-1a", type = "interfacing" },
+      { name = "interfacing-2", cidr = "10.1.21.0/24", availability_zone = "ap-southeast-1b", type = "interfacing" },
+    ]
+  }
+
 }
