@@ -19,3 +19,16 @@ module "vpc-compartment" {
   tags                    = {}
 
 }
+
+# -----------------------------------------------------------------------------
+# Transit Gateway (central hub per diagram)
+# -----------------------------------------------------------------------------
+module "transit_gateway" {
+  source = "../../modules/transit-gateway"
+
+  name_prefix                      = local.name_prefix
+  description                      = "Central hub for inter-VPC routing (Internet, GEN, Workloads)"
+  default_route_table_association  = var.transit_gateway_default_route_table_association
+  default_route_table_propagation  = var.transit_gateway_default_route_table_propagation
+  tags                             = {}
+}

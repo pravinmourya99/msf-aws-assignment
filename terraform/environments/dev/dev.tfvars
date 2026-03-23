@@ -91,3 +91,9 @@ compartments = {
   }
 
 }
+
+# -----------------------------------------------------------------------------
+# Transit Gateway
+# -----------------------------------------------------------------------------
+transit_gateway_default_route_table_association = "disable"
+transit_gateway_default_route_table_propagation = "disable"

@@ -50,3 +50,18 @@ variable "compartments" {
     }))
   }))
 }
+
+# -----------------------------------------------------------------------------
+# Transit Gateway
+# -----------------------------------------------------------------------------
+variable "transit_gateway_default_route_table_association" {
+  description = "TGW default route table association (enable/disable)"
+  type        = string
+  default     = "disable"
+}
+
+variable "transit_gateway_default_route_table_propagation" {
+  description = "TGW default route table propagation (enable/disable)"
+  type        = string
+  default     = "disable"
+}
