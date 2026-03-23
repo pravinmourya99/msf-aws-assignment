@@ -65,3 +65,13 @@ variable "transit_gateway_default_route_table_propagation" {
   type        = string
   default     = "disable"
 }
+
+
+# -----------------------------------------------------------------------------
+# TGW routing: which CIDRs to route via TGW from each compartment
+# -----------------------------------------------------------------------------
+variable "tgw_routes" {
+  description = "Map of compartment name to list of CIDR blocks to route via TGW (e.g. other compartment VPC CIDRs)"
+  type        = map(list(string))
+  default     = {}
+}

@@ -52,3 +52,29 @@ module "tgw_attachment" {
   subnet_ids           = each.value.interfacing_subnet_ids
   tags                 = {}
 }
+
+
+# -----------------------------------------------------------------------------
+# TGW routes: from each compartment's private route tables to other VPC CIDRs via TGW
+# -----------------------------------------------------------------------------
+locals {
+  tgw_route_entries = flatten([
+    for comp_name, cidrs in var.tgw_routes : [
+      for rt_name, rt_id in module.vpc-compartment[comp_name].private_route_table_ids : [
+        for cidr in cidrs : {
+          key             = "${comp_name}-${rt_name}-${replace(cidr, "/", "-")}"
+          route_table_id  = rt_id
+          cidr            = cidr
+        }
+      ]
+    ]
+  ])
+}
+
+resource "aws_route" "to_tgw" {
+  for_each = { for r in local.tgw_route_entries : r.key => r }
+
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.cidr
+  transit_gateway_id     = module.transit_gateway.tgw_id
+}

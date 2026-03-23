@@ -97,3 +97,15 @@ compartments = {
 # -----------------------------------------------------------------------------
 transit_gateway_default_route_table_association = "disable"
 transit_gateway_default_route_table_propagation = "disable"
+
+# -----------------------------------------------------------------------------
+# TGW routes: which CIDRs each compartment can reach via TGW
+# All compartments need routes to every other compartment's VPC CIDR for inter-VPC traffic.
+# -----------------------------------------------------------------------------
+tgw_routes = {
+  "internet"   = ["10.1.0.0/16", "10.2.0.0/16", "10.3.0.0/16", "10.4.0.0/16"]
+  "gen"        = ["10.0.0.0/16", "10.2.0.0/16", "10.3.0.0/16", "10.4.0.0/16"]
+  "workload-x" = ["10.0.0.0/16", "10.1.0.0/16", "10.3.0.0/16", "10.4.0.0/16"]
+  "workload-y" = ["10.0.0.0/16", "10.1.0.0/16", "10.2.0.0/16", "10.4.0.0/16"]
+  "workload-z" = ["10.0.0.0/16", "10.1.0.0/16", "10.2.0.0/16", "10.3.0.0/16"]
+}
