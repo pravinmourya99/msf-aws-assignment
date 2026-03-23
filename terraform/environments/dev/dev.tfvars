@@ -121,3 +121,14 @@ private_link_producers = [
     allowed_principals = ["*"]
   }
 ]
+
+# -----------------------------------------------------------------------------
+# PrivateLink: Consumer (Workload Y consumes Workload Z's API via producer_compartment)
+# -----------------------------------------------------------------------------
+private_link_consumers = [
+  {
+    compartment         = "workload-y"
+    producer_compartment = "workload-z"
+    endpoint_suffix     = "api"
+  }
+]

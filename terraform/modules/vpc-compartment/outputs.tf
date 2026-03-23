@@ -1,3 +1,15 @@
+locals {
+  subnet_ids_by_type = {
+    for type in distinct([for s in var.subnets : s.type]) :
+    type => [for s in var.subnets : aws_subnet.this[s.name].id if s.type == type]
+  }
+
+  security_group_ids = merge(
+      var.enable_security_groups && local.has_public_subnets ? { "public" = aws_security_group.public[0].id } : {},
+    { for k, sg in aws_security_group.by_type : k => sg.id }
+  )
+}
+
 output "vpc_id" {
   description = "ID of the vpc"
   value = aws_vpc.this.id
@@ -20,10 +32,17 @@ output "has_public_subnets" {
 
 output "subnet_ids_by_type" {
   description = "Map of subnet type to list of subnet IDs"
-  value = {
-    for type in distinct([for s in var.subnets : s.type]) :
-    type => [for s in var.subnets : aws_subnet.this[s.name].id if s.type == type]
-  }
+  value       = local.subnet_ids_by_type
+}
+
+output "compute_subnet_ids" {
+  description = "Subnet IDs for type compute (empty list if none)"
+  value       = try(local.subnet_ids_by_type["compute"], [])
+}
+
+output "compute_subnet_count" {
+  description = "Number of subnets with type compute"
+  value       = length(try(local.subnet_ids_by_type["compute"], []))
 }
 
 output "interfacing_subnet_ids" {
@@ -51,10 +70,15 @@ output "nat_gateway_ids" {
 
 output "security_group_ids" {
   description = "Map of type to security group ID"
-  value = merge(
-      var.enable_security_groups && local.has_public_subnets ? { "public" = aws_security_group.public[0].id } : {},
-    { for k, sg in aws_security_group.by_type : k => sg.id }
-  )
+  value       = local.security_group_ids
 }
 
+output "compute_security_group_ids" {
+  description = "List containing the compute security group ID if it exists, otherwise empty"
+  value       = try([local.security_group_ids["compute"]], [])
+}
 
+output "interfacing_security_group_ids" {
+  description = "List containing the interfacing security group ID if it exists, otherwise empty"
+  value       = try([local.security_group_ids["interfacing"]], [])
+}

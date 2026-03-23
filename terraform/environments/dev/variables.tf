@@ -86,3 +86,14 @@ variable "private_link_producers" {
   }))
   default = []
 }
+
+variable "private_link_consumers" {
+  description = "List of consumer configs: set either service_name (external) or producer_compartment (internal producer)"
+  type = list(object({
+    compartment         = string
+    service_name        = optional(string)       # For external AWS or 3rd-party services
+    producer_compartment = optional(string)       # For internal: use this producer's service_name
+    endpoint_suffix     = optional(string, "api")
+  }))
+  default = []
+}
