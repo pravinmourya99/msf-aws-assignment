@@ -32,3 +32,23 @@ module "transit_gateway" {
   default_route_table_propagation  = var.transit_gateway_default_route_table_propagation
   tags                             = {}
 }
+
+
+# -----------------------------------------------------------------------------
+# TGW VPC Attachments (each compartment with interfacing subnets)
+# -----------------------------------------------------------------------------
+module "tgw_attachment" {
+  source = "../../modules/tgw-attachment"
+
+  for_each = {
+    for k, v in module.vpc-compartment : k => v
+    if length(v.interfacing_subnet_ids) > 0
+  }
+
+  name_prefix          = local.name_prefix
+  compartment_name     = each.key
+  transit_gateway_id   = module.transit_gateway.tgw_id
+  vpc_id               = each.value.vpc_id
+  subnet_ids           = each.value.interfacing_subnet_ids
+  tags                 = {}
+}

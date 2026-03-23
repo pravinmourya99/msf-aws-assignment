@@ -26,6 +26,14 @@ output "subnet_ids_by_type" {
   }
 }
 
+output "interfacing_subnet_ids" {
+  description = "List of interfacing subnet IDs (for TGW attachment)"
+  value = [
+    for s in var.subnets : aws_subnet.this[s.name].id
+    if s.type == "interfacing"
+  ]
+}
+
 output "private_route_table_ids" {
   description = "Map of subnet name to private route table ID (for adding TGW routes)"
   value       = { for k, rt in aws_route_table.private : k => rt.id }
@@ -48,4 +56,5 @@ output "security_group_ids" {
     { for k, sg in aws_security_group.by_type : k => sg.id }
   )
 }
+
 
