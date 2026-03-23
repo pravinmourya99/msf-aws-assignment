@@ -60,4 +60,20 @@ compartments = {
     ]
   }
 
+  # Workload Compartment Module Y
+  workload-y = {
+    vpc_cidr                = "10.3.0.0/16"
+    enable_internet_gateway = false
+    enable_nat_gateway      = false
+    single_nat_gateway      = true
+    enable_security_groups  = true
+    subnets = [
+      { name = "compute-1", cidr = "10.3.10.0/24", availability_zone = "ap-southeast-1a", type = "compute" },
+      { name = "compute-2", cidr = "10.3.11.0/24", availability_zone = "ap-southeast-1b", type = "compute" },
+      { name = "interfacing-1", cidr = "10.3.20.0/24", availability_zone = "ap-southeast-1a", type = "interfacing" },
+      { name = "interfacing-2", cidr = "10.3.21.0/24", availability_zone = "ap-southeast-1b", type = "interfacing" },
+    ]
+  }
+
+
 }
