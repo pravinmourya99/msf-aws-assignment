@@ -75,3 +75,14 @@ variable "tgw_routes" {
   type        = map(list(string))
   default     = {}
 }
+
+variable "private_link_producers" {
+  description = "List of producer configs: { compartment, subnet_type, service_suffix, allowed_principals }"
+  type = list(object({
+    compartment        = string
+    subnet_type        = string   # e.g. compute or interfacing
+    service_suffix     = optional(string, "api")
+    allowed_principals = optional(list(string), ["*"])
+  }))
+  default = []
+}

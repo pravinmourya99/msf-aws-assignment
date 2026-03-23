@@ -78,3 +78,20 @@ resource "aws_route" "to_tgw" {
   destination_cidr_block = each.value.cidr
   transit_gateway_id     = module.transit_gateway.tgw_id
 }
+
+# -----------------------------------------------------------------------------
+# PrivateLink: Expose API (producer) - e.g. Workload Z exposes service for others
+# -----------------------------------------------------------------------------
+module "private_link_producer" {
+  source = "../../modules/private-link-producer"
+
+  for_each = { for p in var.private_link_producers : p.compartment => p }
+
+  name_prefix         = local.name_prefix
+  compartment_name    = each.value.compartment
+  vpc_id              = module.vpc-compartment[each.value.compartment].vpc_id
+  subnet_ids          = module.vpc-compartment[each.value.compartment].subnet_ids_by_type[each.value.subnet_type]
+  service_suffix      = each.value.service_suffix
+  allowed_principals  = each.value.allowed_principals
+  tags                = {}
+}

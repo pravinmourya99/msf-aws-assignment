@@ -109,3 +109,15 @@ tgw_routes = {
   "workload-y" = ["10.0.0.0/16", "10.1.0.0/16", "10.2.0.0/16", "10.4.0.0/16"]
   "workload-z" = ["10.0.0.0/16", "10.1.0.0/16", "10.2.0.0/16", "10.3.0.0/16"]
 }
+
+# -----------------------------------------------------------------------------
+# PrivateLink: Producer (Workload Z exposes API via NLB + Endpoint Service)
+# -----------------------------------------------------------------------------
+private_link_producers = [
+  {
+    compartment        = "workload-z"
+    subnet_type        = "compute"
+    service_suffix     = "api"
+    allowed_principals = ["*"]
+  }
+]
